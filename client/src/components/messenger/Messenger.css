@@ -1,0 +1,38 @@
+#messengerForm {
+    position: absolute;
+    width: 1392px;
+    height: 576px;
+    left: 26px;
+    top: 413px;
+    border: 1px;
+}
+
+#chat {
+    box-sizing: border-box;
+    position: absolute;
+    width: 935px;
+    height: 526px;
+    left: 426px;
+    top: 32px;
+    border: 2px solid #5689EE;
+}
+
+#sendMessage {
+    box-sizing: border-box;
+    position: absolute;
+    width: 175px;
+    height: 30px;
+    left: 752px;
+    top: 482px;
+    border: 1px solid #000000;
+}
+
+#messageInput {
+    box-sizing: border-box;
+    position: absolute;
+    width: 739px;
+    height: 41px;
+    left: 7px;
+    top: 476px;
+    border: 1px solid #000000;
+}

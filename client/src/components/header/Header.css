@@ -1,0 +1,51 @@
+.header {
+    position: absolute;
+    width: 1440px;
+    height: 54px;
+    left: 0px;
+    top: 0px;
+    background: #333333;
+}
+
+#logOut {
+    position: absolute;
+    width: 51px;
+    height: 34px;
+    left: 978px;
+    top: 10px;
+    background: #FFFFFF;
+    border: none;
+}
+
+#openRoom {
+    box-sizing: border-box;
+    position: absolute;
+    width: 369px;
+    height: 34px;
+    left: 1049px;
+    top: 10px;
+    background: #FFFFFF;
+    border: none;
+}
+
+#openRegi {
+    box-sizing: border-box;
+    position: absolute;
+    width: 232px;
+    height: 34px;
+    left: 925px;
+    top: 10px;
+    background: #FFFFFF;
+    border: 1px solid #000000;
+}
+
+#openAuth {
+    box-sizing: border-box;
+    position: absolute;
+    width: 232px;
+    height: 34px;
+    left: 1186px;
+    top: 10px;
+    background: #FFFFFF;
+    border: 1px solid #000000;
+}
