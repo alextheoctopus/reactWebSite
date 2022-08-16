@@ -1,15 +1,9 @@
-/*import { configureStore } from 'redux';
-
-const authReducer = (state = {}, action, login, password) => {
-    switch (action.type) {
-        case 'btnOnClickHandlerAuth':
-            state.push({
-                login: login,
-                password: password
-            });
-            return state;
+import { configureStore } from "@reduxjs/toolkit";
+import authStore from "./features/authStore/authStore";
+export default configureStore(
+    {
+        reducer: {
+            auth:authStore,
+        }
     }
-};
-
-const store = configureStore(authReducer);
-export default store;*/
+);

@@ -19,7 +19,6 @@ const Header = ({ socket, setAuthorized, setShowForm, authorized, userData }) =>
                     <button id="openRoom" onClick={onClickHandlerShowRoom}>{name}</button>
                 </> :
                 <>
-                    {/* {localStorage.clear()} */}
                     <button id="openauth" onClick={() => setShowForm('auth')}>Войти</button>
                     <button id="openRegi" onClick={() => setShowForm('reg')}>Зарегистрироваться</button>
                 </>

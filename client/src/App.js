@@ -11,19 +11,15 @@ import Messenger from "./components/messenger/Messenger";
 const socket = io('http://localhost:3003');
 
 const App = () => {
-/*   const [session, setSession] = useState(null); */
-  socket.on('authAnswer', (userData) => {
-    setUserData(userData);
-    /* setSession(localStorage.setItem('login', userData.login));//короче не знаю */
-  });
-
 
   const [showForm, setShowForm] = useState(null);
   const [authorized, setAuthorized] = useState(false);
   const [userData, setUserData] = useState(null);
   const [openMessenger, setOpenMessenger] = useState(false);
 
-
+  socket.on('authAnswer', (userData) => {
+    setUserData(userData);
+  });
 
   return (
     <>
@@ -35,8 +31,9 @@ const App = () => {
             showForm === 'reg' ? <Reg socket={socket} key={authorized} setAuthorized={setAuthorized} setShowForm={setShowForm} /> :
               showForm === 'cabinet' ? <PersonalCabinet userData={userData} setOpenMessenger={setOpenMessenger} /> : ''}
       {
-        openMessenger === true ? <Messenger socket={socket}/> : ''}
+        openMessenger === true ? <Messenger socket={socket} /> : ''}
     </>
+
   )
 }
 export default App;
