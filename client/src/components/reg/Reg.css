@@ -1,0 +1,60 @@
+#name {
+    box-sizing: border-box;
+    position: absolute;
+    width: 544px;
+    height: 59px;
+    left: 65px;
+    top: 67px;
+    border-bottom: 1px solid #000000;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: none;
+}
+
+#login {
+    box-sizing: border-box;
+    position: absolute;
+    width: 544px;
+    height: 59px;
+    left: 65px;
+    top: 154px;
+    border-bottom: 1px solid #000000;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: none;
+}
+
+#password {
+    box-sizing: border-box;
+    position: absolute;
+    width: 544px;
+    height: 59px;
+    left: 65px;
+    top: 241px;
+    border-bottom: 1px solid #000000;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: none;
+}
+
+#regSbmBtn {
+    position: absolute;
+    width: 232px;
+    height: 34px;
+    left: 221px;
+    top: 363px;
+    background: none;
+    border: none;
+}
+
+.reg-form {
+    position: absolute;
+    width: 674px;
+    height: 469px;
+    left: 383px;
+    top: 194px;
+    background: rgba(189, 203, 232, 0.28);
+}
