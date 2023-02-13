@@ -1,17 +1,35 @@
-import React from "react";
-/* import { useEffect, useState } from "react"; */
+import React, { useState } from "react";
+import { useEffect } from "react";
 import '../usersBar/usersBar.css';
 
-const UsersBar = ({ socket }) => {
-    socket.on('getUsers',async (params) => { console.log(params); })
-    const massive = [1, 2, 3, 4, 5];
-    const Numbs = massive.map((number) =>
-        <button>{number}</button>
-    )
 
+const UsersBar = ({ socket }) => {
+    //donloading&updating
+   // const [data, setData] = useState(null);
+    socket.on("sendDataMessenger", (users) => {
+        /* setData(users); */
+        console.log(users);
+    });
+    //useEffect((data) => console.log(data), []);
+   /*  let test = [
+        {
+            user_id: 1, name: 'lala', age: 8
+        },
+        {
+            user_id: 2, name: 'lpla', age: 9
+        }
+    ] */
     return (
-        <div className="usersBar">
-            {Numbs}        </div>
+        <>
+            {/* {test.map(
+                function (item) {
+                    return <p key={item.user_id}>
+                        <span>{item.name}</span>
+                    </p>;
+                })
+            } */}
+            {/* {JSON.stringify(data)} */}
+        </>
     );
 }
 export default UsersBar;

@@ -7,38 +7,40 @@ const io = require('socket.io')(server, {
     },
 });
 
-const { NAME, PORT, DATABASE } = require('./config.js');
+const { NAME, PORT } = require('./config.js');
 const DB = require('./application/modules/DB/DB');
 const APP = require('./application/Application');
 
 const db = new DB();
 
 function router(method, params) {
-    const app = new APP(params, db); 
+    const app = new APP(params, db);
     if (method) {
         switch (method) {
             case 'registration':
                 return app.registration();
             case 'login':
                 return app.loginMethod();
-            case 'logout': { }
+            case 'logout':
                 return app.logoutMethod();
         }
     }
 }
 
+
+
 io.on("connection", async (socket) => {
+
+
+
     socket.on('registration', async (params) => {
-        let { login, password, name } = params;
-        let result = await db.getUser(login);
-        let users = await db.getUsers();
-        if (users) {
-            socket.emit('getUsers', users);
-        }
+        let result = await db.getUser(params.login);
+
         if (!result) {
             router('registration', params);
+            let users = await db.getUsers();
             console.log("Вы зарегистрированы!");
-            socket.emit('authAnswer', params);
+            socket.emit('authAnswer', { params, users });
         } else {
             socket.emit('authAnswer', 'ошибка');
         }
@@ -47,13 +49,11 @@ io.on("connection", async (socket) => {
     socket.on('authorization', async (params) => {
         let result = await db.getUser(params.login);
         let users = await db.getUsers();
-        if (users) {
-            socket.emit('getUsers', users);
-        }
-        if (result) {
+
+        if (result && users) {
             if (result.login === params.login && result.password === params.password) {
                 router('login', params);
-                socket.emit('authAnswer', result);
+                socket.emit('authAnswer', { result, users });
             }
         }
         else {
@@ -62,7 +62,8 @@ io.on("connection", async (socket) => {
     });
     socket.on('logOut', (params) => {
         router('logout', params);
-    })
+    });
+
 });
 
 server.listen(PORT, () => console.log('сервер работает', NAME));

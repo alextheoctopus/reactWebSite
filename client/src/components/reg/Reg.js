@@ -3,7 +3,7 @@ import '../reg/Reg.css';
 import { useDispatch } from 'react-redux';
 import { logining } from "../../store/features/authStore/authStore";
 
-const Reg = ({ socket, setShowForm, setErr }) => {
+const Reg = ({ socket, setShowForm, setUsers, setErr }) => {
     const inputLogin = useRef(null);
     const inputPassword = useRef(null);
     const inputName = useRef(null);
@@ -20,11 +20,12 @@ const Reg = ({ socket, setShowForm, setErr }) => {
                 setShowForm(null);
                 setErr('loginIsBusy');
             } else {
-                localStorage.setItem('name', params.name);
+                localStorage.setItem('name', params.params.name);
                 localStorage.setItem('login', login);
                 localStorage.setItem('status', true);
-                dispatch(logining(params.name));
+                dispatch(logining(params.params.name));
                 setShowForm(null);
+                setUsers(params.users);
             }
         })
     };

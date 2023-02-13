@@ -1,5 +1,5 @@
 const USERS = require('./modules/users/Users');
-const DB = require('./modules/DB/DB');
+//const DB = require('./modules/DB/DB');
 
 class Application {
     constructor(params, db) {

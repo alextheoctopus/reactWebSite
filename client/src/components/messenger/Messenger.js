@@ -3,7 +3,7 @@ import '../messenger/Messenger.css';
 import { useRef, useState } from "react";
 import UsersBar from "../usersBar/usersBar";
 
-const Messenger = ({ socket }) => {
+const Messenger = ({ socket, users }) => {
     const [message, setMessage] = useState(null);
     const inputText = useRef(null);
     const onClickSendMessage = () => {
@@ -14,7 +14,7 @@ const Messenger = ({ socket }) => {
 
     return (
         <div id="messengerForm">
-            <UsersBar  socket={socket} />
+            <UsersBar socket={socket} users={users} />
             <div id="chat">
                 <input id="messageInput" ref={inputText}></input>
                 <button id="sendMessage" onClick={onClickSendMessage}>Отправить</button>

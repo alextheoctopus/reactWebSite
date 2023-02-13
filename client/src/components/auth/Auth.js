@@ -3,8 +3,8 @@ import './Auth.css';
 import { useDispatch } from 'react-redux';
 import { logining } from "../../store/features/authStore/authStore";
 
-const Auth = ({ socket, setShowForm,setErr}) => {
-    
+const Auth = ({ socket, setShowForm,setUsers, setErr }) => {
+
     let inputLogin = useRef(null);
     let inputPassword = useRef(null);
     const dispatch = useDispatch();
@@ -13,17 +13,19 @@ const Auth = ({ socket, setShowForm,setErr}) => {
         const password = inputPassword.current.value;
         /* отправка данных через сокеты  */
         socket.emit("authorization", ({ login, password }));
-       
+
         socket.on("authAnswer", (params) => {
             if (params === 'ошибка') {
                 setShowForm(null);
                 setErr('notFinded');
             } else {
-                localStorage.setItem('name', params.name);
+                localStorage.setItem('name', params.result.name);
                 localStorage.setItem('login', login);
                 localStorage.setItem('status', true);
-                dispatch(logining(params.name));
+                
+                dispatch(logining(params.result.name));
                 setShowForm(null);
+                setUsers(params.users);
             }
 
         });

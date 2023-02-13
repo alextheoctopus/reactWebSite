@@ -50,7 +50,7 @@ class DB {
     }
 
     getUsers() {
-        let query = "SELECT name FROM USERS;";
+        let query = "SELECT user_id , name FROM USERS;";
         return new Promise(resolve => this.db.all(query, (err, rows) => resolve(err ? null : rows)));
     }
 }

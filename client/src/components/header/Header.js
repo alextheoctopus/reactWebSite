@@ -11,11 +11,12 @@ const Header = ({ socket, auth, setShowForm, setOpenMessenger, setErr }) => {
         socket.emit('logOut', auth);
         setOpenMessenger(false);
         setShowForm(null);
-
+        localStorage.setItem('enter', false);
     }
 
     const onClickHandlerShowRoom = () => {
-        setShowForm('cabinet');
+        //setShowForm('entered');
+        localStorage.setItem('enter', 'entered');
     }
 
     return (

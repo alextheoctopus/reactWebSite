@@ -1,14 +1,5 @@
 const CONFIG = {
-    NAME: 'courseWork',
+    NAME: 'chat',
     PORT: 3003,
-
-    DATABASE: {
-        NAME: 'courseWork.db'
-    },
-
-    MEDIATOR: {
-        TRIGGERS: {},
-        EVENTS: {}
-    }
 }
 module.exports = CONFIG;
