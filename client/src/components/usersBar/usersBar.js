@@ -3,32 +3,27 @@ import { useEffect } from "react";
 import '../usersBar/usersBar.css';
 
 
-const UsersBar = ({ socket }) => {
-    //donloading&updating
-   // const [data, setData] = useState(null);
-    socket.on("sendDataMessenger", (users) => {
-        /* setData(users); */
-        console.log(users);
-    });
-    //useEffect((data) => console.log(data), []);
-   /*  let test = [
-        {
-            user_id: 1, name: 'lala', age: 8
-        },
-        {
-            user_id: 2, name: 'lpla', age: 9
+const UsersBar = () => {
+    const [users, setUsers] = useState(null);
+    useEffect(() => {
+        let fetchData = async () => {
+            const response = await fetch('http://192.168.0.107:3003/api/users');
+            const answer = await response.json();
+            setUsers(answer);
         }
-    ] */
+        fetchData();
+    },[]);
+
     return (
         <>
-            {/* {test.map(
+            {users != null ? users.map(
                 function (item) {
                     return <p key={item.user_id}>
                         <span>{item.name}</span>
                     </p>;
-                })
-            } */}
-            {/* {JSON.stringify(data)} */}
+                }) : 'не работает'
+            }
+
         </>
     );
 }

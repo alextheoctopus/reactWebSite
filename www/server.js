@@ -7,6 +7,15 @@ const io = require('socket.io')(server, {
     },
 });
 
+const cors=require("cors");
+const corsOptions ={
+   origin:'*', 
+   credentials:true,            //access-control-allow-credentials:true
+   optionSuccessStatus:200,
+}
+
+app.use(cors(corsOptions))
+
 const { NAME, PORT } = require('./config.js');
 const DB = require('./application/modules/DB/DB');
 const APP = require('./application/Application');
@@ -27,11 +36,23 @@ function router(method, params) {
     }
 }
 
+/* app.get('/api/check', (req, res) => {
+    res.send('ok');
+});
 
+app.get('/api/example', (req, res) => {
+    console.log(req.query);
+    const text = Object.keys(req.query).map(key => `key=${key} value= ${req.query[key]}`).join('; ');
+    res.send(text);
+}); */
+
+
+app.get('/api/users', async (req, res) => {
+    let users = await db.getUsers();
+    res.json(users);
+});
 
 io.on("connection", async (socket) => {
-
-
 
     socket.on('registration', async (params) => {
         let result = await db.getUser(params.login);
@@ -54,6 +75,7 @@ io.on("connection", async (socket) => {
             if (result.login === params.login && result.password === params.password) {
                 router('login', params);
                 socket.emit('authAnswer', { result, users });
+                //io.emit("sendDataMessenger", { data: users });//всем клиентам 
             }
         }
         else {

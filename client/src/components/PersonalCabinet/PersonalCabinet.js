@@ -1,9 +1,13 @@
+import { useEffect } from 'react';
 import './PersonalCabinet.css';
-const PersonalCabinet = ({ setOpenMessenger,auth}) => {
+
+const PersonalCabinet = ({ setOpenMessenger, auth }) => {
+
     const onClickOpenMessenger = () => {
         //localStorage.setItem('openMessenger',true);
         setOpenMessenger(true);
     }
+
     return (
         <div className="cabinet">
             <div id="mainInfo">

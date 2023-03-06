@@ -13,11 +13,7 @@ import Err from "./components/error/Err";
 /* const socket = io('http://192.168.0.107:3003'); */
 const socket = io('http://localhost:3003');
 
-socket.on("connect", /* async */ () => {
-  console.log('22');
-  /* let users = await db.getUsers();
-  socket.emit("sendDataMessenger", users); */
-}); 
+
 const mapStateToProps = (state) => {
   const { auth } = state;
   return { auth };
@@ -28,17 +24,17 @@ const App = ({ auth }) => {
   const [showForm, setShowForm] = useState(null);
   const [openMessenger, setOpenMessenger] = useState(false);
   const [err, setErr] = useState(null);
-  const [users, setUsers] = useState({});
+
   return (
     <>
       <Header socket={socket} auth={auth} setShowForm={setShowForm} setOpenMessenger={setOpenMessenger} setErr={setErr} />
       <Main />
       {
         showForm === null ? '' :
-          showForm === 'auth' ? <Auth socket={socket} setShowForm={setShowForm} setUsers={setUsers} setErr={setErr} /> :
-            showForm === 'reg' ? <Reg socket={socket} setShowForm={setShowForm} setUsers={setUsers} setErr={setErr} /> : ''}
-      {localStorage.getItem('enter') === 'entered' ? <PersonalCabinet auth={auth} setOpenMessenger={setOpenMessenger} /> : ''}
-      {openMessenger === true ? <Messenger socket={socket} users={users} /> : ''}
+          showForm === 'auth' ? <Auth socket={socket} setShowForm={setShowForm}  setErr={setErr} /> :
+            showForm === 'reg' ? <Reg socket={socket} setShowForm={setShowForm}  setErr={setErr} /> :
+              showForm === 'cabinet' ? <PersonalCabinet auth={auth} setOpenMessenger={setOpenMessenger} /> : ''}
+      {openMessenger === true ? <Messenger socket={socket}  /> : ''}
       {err === 'notFinded' ? <Err info={'Введён неверный логин или пароль!'} /> :
         err === 'loginIsBusy' ? <Err info={'Логин занят!'} /> : ''}
     </>

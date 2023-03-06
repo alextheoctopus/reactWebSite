@@ -5,6 +5,7 @@ import UsersBar from "../usersBar/usersBar";
 
 const Messenger = ({ socket, users }) => {
     const [message, setMessage] = useState(null);
+
     const inputText = useRef(null);
     const onClickSendMessage = () => {
         const messageText = inputText.current.value;
@@ -14,7 +15,7 @@ const Messenger = ({ socket, users }) => {
 
     return (
         <div id="messengerForm">
-            <UsersBar socket={socket} users={users} />
+            <UsersBar  />
             <div id="chat">
                 <input id="messageInput" ref={inputText}></input>
                 <button id="sendMessage" onClick={onClickSendMessage}>Отправить</button>
