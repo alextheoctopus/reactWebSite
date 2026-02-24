@@ -1,46 +1,53 @@
-import React, { useRef } from "react";
-import './Auth.css';
-import { useDispatch } from 'react-redux';
-import { logining } from "../../store/features/authStore/authStore";
+import React, { useRef, useState } from "react";
+import "./Auth.css";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../auth/AuthContext";
 
-const Auth = ({ socket, setShowForm,setUsers, setErr }) => {
+export default function Auth() {
+    const inputLogin = useRef(null);
+    const inputPassword = useRef(null);
+    const { login } = useAuth();
+    const nav = useNavigate();
 
-    let inputLogin = useRef(null);
-    let inputPassword = useRef(null);
-    const dispatch = useDispatch();
-    const btnOnClickHandler = () => {
-        const login = inputLogin.current.value;
-        const password = inputPassword.current.value;
-        /* отправка данных через сокеты  */
-        socket.emit("authorization", ({ login, password }));
+    const [err, setErr] = useState("");
+    const [busy, setBusy] = useState(false);
 
-        socket.on("authAnswer", (params) => {
-            if (params === 'ошибка') {
-                setShowForm(null);
-                setErr('notFinded');
-            } else {
-                localStorage.setItem('name', params.result.name);
-                localStorage.setItem('login', login);
-                localStorage.setItem('status', true);
-                
-                dispatch(logining(params.result.name));
-                setShowForm(null);
-                setUsers(params.users);
-            }
-
-        });
-    }
+    const btnOnClickHandler = async () => {
+        setErr("");
+        setBusy(true);
+        try {
+            await login({
+                login: inputLogin.current.value.trim(),
+                password: inputPassword.current.value,
+            });
+            nav("/notes");
+        } catch (e) {
+            setErr(e?.message || "Ошибка входа");
+        } finally {
+            setBusy(false);
+        }
+    };
 
     return (
-        <>
-            <div className="authForm">
-                <input ref={inputLogin} id="loginAuth" placeholder="Логин" />
-                <input ref={inputPassword} id="passwordAuth" placeholder="Пароль" />
-                <button id="authSbmBtn" onClick={btnOnClickHandler}>Войти</button>
+        <div className="pageCenter">
+            <div className="authCard">
+
+
+                <input ref={inputLogin} placeholder="Логин" />
+                <input ref={inputPassword} placeholder="Пароль" type="password" />
+
+                {err && <div className="authError">{err}</div>}
+
+                <button onClick={btnOnClickHandler} disabled={busy}>
+                    Войти
+                </button>
+                <div className="authTop">
+                    Нет аккаунта?
+                    <Link to="/register" className="authLink">
+                        Регистрация
+                    </Link>
+                </div>
             </div>
-        </>
-
-    )
+        </div>
+    );
 }
-
-export default Auth;

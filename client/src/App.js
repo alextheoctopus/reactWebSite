@@ -1,45 +1,42 @@
-import React, { useState } from "react";
-import { io } from 'socket.io-client';
-import { connect } from 'react-redux';
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Header from './components/header/Header';
-import Main from './components/main/Main';
-import Reg from "./components/reg/Reg";
+import "./App.css"; // ✅ можно тут (или в index.js)
+
+import { AuthProvider } from "./auth/AuthContext";
+import ProtectedRoute from "./auth/ProtectedRoute";
+
+import Header from "./components/header/Header";
 import Auth from "./components/auth/Auth";
-import PersonalCabinet from "./components/PersonalCabinet/PersonalCabinet";
-import Messenger from "./components/messenger/Messenger";
-import Err from "./components/error/Err";
+import Reg from "./components/reg/Reg";
+import NotesPage from "./pages/NotesPage";
 
-/* const socket = io('http://192.168.0.107:3003'); */
-const socket = io('http://localhost:3003');
-
-
-const mapStateToProps = (state) => {
-  const { auth } = state;
-  return { auth };
-}
-
-const App = ({ auth }) => {
-
-  const [showForm, setShowForm] = useState(null);
-  const [openMessenger, setOpenMessenger] = useState(false);
-  const [err, setErr] = useState(null);
-
+export default function App() {
   return (
-    <>
-      <Header socket={socket} auth={auth} setShowForm={setShowForm} setOpenMessenger={setOpenMessenger} setErr={setErr} />
-      <Main />
-      {
-        showForm === null ? '' :
-          showForm === 'auth' ? <Auth socket={socket} setShowForm={setShowForm}  setErr={setErr} /> :
-            showForm === 'reg' ? <Reg socket={socket} setShowForm={setShowForm}  setErr={setErr} /> :
-              showForm === 'cabinet' ? <PersonalCabinet auth={auth} setOpenMessenger={setOpenMessenger} /> : ''}
-      {openMessenger === true ? <Messenger socket={socket}  /> : ''}
-      {err === 'notFinded' ? <Err info={'Введён неверный логин или пароль!'} /> :
-        err === 'loginIsBusy' ? <Err info={'Логин занят!'} /> : ''}
-    </>
+    <AuthProvider>
+      <BrowserRouter>
+        <Header />
 
-  )
+        {/* ✅ ВОТ СЮДА */}
+        <div className="appShell">
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<Auth />} />
+            <Route path="/register" element={<Reg />} />
+
+            <Route
+              path="/notes"
+              element={
+                <ProtectedRoute>
+                  <NotesPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
+  );
 }
-
-export default connect(mapStateToProps)(App);

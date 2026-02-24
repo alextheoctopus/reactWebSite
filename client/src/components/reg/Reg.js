@@ -1,43 +1,52 @@
-import { useRef } from "react";
-import '../reg/Reg.css';
-import { useDispatch } from 'react-redux';
-import { logining } from "../../store/features/authStore/authStore";
+import { useRef, useState } from "react";
+import "./Reg.css";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../auth/AuthContext";
 
-const Reg = ({ socket, setShowForm, setUsers, setErr }) => {
+export default function Reg() {
     const inputLogin = useRef(null);
     const inputPassword = useRef(null);
     const inputName = useRef(null);
-    const dispatch = useDispatch();
+    const { register } = useAuth();
+    const nav = useNavigate();
 
-    const registrationClickHandler = () => {
-        const login = inputLogin.current.value;
-        const password = inputPassword.current.value;
-        const name = inputName.current.value;
-        /* здесь проверить данные и отправить в бэк */
-        socket.emit('registration', ({ login, password, name }));
-        socket.on("authAnswer", (params) => {
-            if (params === 'ошибка') {
-                setShowForm(null);
-                setErr('loginIsBusy');
-            } else {
-                localStorage.setItem('name', params.params.name);
-                localStorage.setItem('login', login);
-                localStorage.setItem('status', true);
-                dispatch(logining(params.params.name));
-                setShowForm(null);
-                setUsers(params.users);
-            }
-        })
+    const [err, setErr] = useState("");
+    const [busy, setBusy] = useState(false);
+
+    const registrationClickHandler = async () => {
+        setErr("");
+        setBusy(true);
+        try {
+            await register({
+                name: inputName.current.value.trim(),
+                login: inputLogin.current.value.trim(),
+                password: inputPassword.current.value,
+            });
+            nav("/notes");
+        } catch (e) {
+            setErr(e?.message || "Ошибка регистрации");
+        } finally {
+            setBusy(false);
+        }
     };
 
     return (
-        <div className="reg-form">
-            <input id="name" ref={inputName} placeholder="Ваше имя" />
-            <input id="login" ref={inputLogin} placeholder="Логин" />
-            <input id="password" ref={inputPassword} placeholder="Пароль" />
-            <button id="regSbmBtn" onClick={registrationClickHandler}>Зарегистрироваться</button>
+        <div className="pageCenter">
+            <div className="authCard">
+                <input id="name" ref={inputName} placeholder="Ваше имя" />
+                <input id="login" ref={inputLogin} placeholder="Логин" />
+                <input id="password" ref={inputPassword} placeholder="Пароль" type="password" />
+
+                {err ? <div className="authError">{err}</div> : null}
+                <button id="regSbmBtn" onClick={registrationClickHandler} disabled={busy}>
+                    Зарегистрироваться
+                </button>
+
+                <div className="authTop">
+                    Уже есть аккаунт?
+                    <Link to="/login" className="authLink">Войти</Link>
+                </div>
+            </div>
         </div>
     );
 }
-
-export default Reg;

@@ -1,0 +1,61 @@
+/* App.css */
+
+body {
+    margin: 0;
+    background: #f5f6fa;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.wholeApp {
+    padding-top: 80px;
+    /* чтобы контент не был под header */
+    display: flex;
+    justify-content: center;
+}
+
+.contentContainer {
+    width: 100%;
+    max-width: 900px;
+    padding: 20px;
+}
+
+.createBtn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background: #10b981;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+/* App.css */
+
+:root {
+  --header-h: 70px;
+}
+
+.header {
+  height: var(--header-h);
+}
+/* центрируем страницы login/register */
+.pageCenter {
+  min-height: calc(100vh - 70px); /* 70 = высота header */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.appShell {
+  padding-top: var(--header-h); /* ключевая строка */
+  min-height: 100vh;
+  background: #f5f6fa;
+}
+
+.contentContainer {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
