@@ -19,11 +19,12 @@ describe("BoardPage", () => {
 
     render(<BoardPage />);
 
-    await waitFor(() => expect(BoardApi.getBoard).toHaveBeenCalled());
+    await screen.findByText(/Last author:/i);
 
     expect(screen.getByText(/Last author:/i)).toBeInTheDocument();
     expect(screen.getByText(/Timur/i)).toBeInTheDocument();
     expect(screen.getByDisplayValue("Initial text")).toBeInTheDocument();
+    expect(BoardApi.getBoard).toHaveBeenCalledTimes(1);
   });
 
   test("updates board text", async () => {
@@ -41,9 +42,8 @@ describe("BoardPage", () => {
 
     render(<BoardPage />);
 
-    await waitFor(() => expect(BoardApi.getBoard).toHaveBeenCalled());
+    const textarea = await screen.findByRole("textbox");
 
-    const textarea = screen.getByRole("textbox");
     fireEvent.change(textarea, { target: { value: "Changed text" } });
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
 
@@ -51,6 +51,6 @@ describe("BoardPage", () => {
       expect(BoardApi.updateBoard).toHaveBeenCalledWith("Changed text");
     });
 
-    expect(screen.getByDisplayValue("Changed text")).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("Changed text")).toBeInTheDocument();
   });
 });

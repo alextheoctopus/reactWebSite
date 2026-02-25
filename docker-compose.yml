@@ -1,18 +1,54 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:16-alpine
     container_name: dev_ops_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: dev_ops
-      POSTGRES_USER: devops
-      POSTGRES_PASSWORD: devops
+      POSTGRES_DB: ${POSTGRES_DB:-dev_ops}
+      POSTGRES_USER: ${POSTGRES_USER:-devops}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devops}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devops} -d ${POSTGRES_DB:-dev_ops}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: dev_ops_server
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-dev_ops}
+      DB_USER: ${POSTGRES_USER:-devops}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-devops}
+      JWT_SECRET: ${JWT_SECRET:-dasreewrgfd534gfdjhrfthrthgfhtryhdssdfsdfdgfd}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+      SERVER_PORT: ${SERVER_PORT:-8080}
+    ports:
+      - "${SERVER_PUBLISHED_PORT:-8080}:8080"
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-}
+    container_name: dev_ops_client
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_started
+    ports:
+      - "${CLIENT_PUBLISHED_PORT:-3000}:80"
 
 volumes:
   postgres_data:
