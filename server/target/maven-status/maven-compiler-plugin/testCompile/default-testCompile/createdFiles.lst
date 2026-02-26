@@ -1,5 +1,7 @@
-com\devops\board\integration\AuthFlowIntegrationTest.class
+com\devops\board\integration\BoardItemsCrudIntegrationTest.class
 com\devops\board\service\AuthServiceTest.class
 com\devops\board\integration\BoardFlowIntegrationTest.class
+com\devops\board\integration\AuthFlowIntegrationTest.class
 com\devops\board\integration\IntegrationTestBase.class
+com\devops\board\service\BoardItemServiceTest.class
 com\devops\board\service\BoardServiceTest.class

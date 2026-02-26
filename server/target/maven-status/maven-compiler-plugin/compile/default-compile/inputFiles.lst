@@ -7,13 +7,18 @@ C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\dto\au
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\dto\auth\LoginRequest.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\dto\auth\RegisterRequest.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\dto\auth\UserDto.java
+C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\dto\board\BoardItemResponse.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\dto\board\BoardResponse.java
+C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\dto\board\CreateBoardItemRequest.java
+C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\dto\board\UpdateBoardItemRequest.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\dto\board\UpdateBoardRequest.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\dto\common\ErrorResponse.java
+C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\entity\BoardItem.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\entity\BoardState.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\entity\User.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\exception\ApiException.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\exception\GlobalExceptionHandler.java
+C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\repository\BoardItemRepository.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\repository\BoardStateRepository.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\repository\UserRepository.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\security\AuthenticatedUser.java
@@ -21,4 +26,5 @@ C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\securi
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\security\JwtService.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\security\RestAuthenticationEntryPoint.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\service\AuthService.java
+C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\service\BoardItemService.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\main\java\com\devops\board\service\BoardService.java
