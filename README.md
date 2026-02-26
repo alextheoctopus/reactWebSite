@@ -1,5 +1,7 @@
 # Shared Board App
 
+![CI](https://github.com/alextheoctopus/reactWebSite/actions/workflows/ci.yml/badge.svg)
+
 Stack:
 - frontend: React + JS
 - backend: Java (Spring Boot)
