@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import "./App.css"; // ✅ можно тут (или в index.js)
+import "./App.css";
 
 import { AuthProvider } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
@@ -9,7 +9,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import Header from "./components/header/Header";
 import Auth from "./components/auth/Auth";
 import Reg from "./components/reg/Reg";
-import NotesPage from "./pages/NotesPage";
+import BoardPage from "./pages/BoardPage";
 
 export default function App() {
   return (
@@ -17,23 +17,22 @@ export default function App() {
       <BrowserRouter>
         <Header />
 
-        {/* ✅ ВОТ СЮДА */}
         <div className="appShell">
           <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Navigate to="/board" replace />} />
             <Route path="/login" element={<Auth />} />
             <Route path="/register" element={<Reg />} />
 
             <Route
-              path="/notes"
+              path="/board"
               element={
                 <ProtectedRoute>
-                  <NotesPage />
+                  <BoardPage />
                 </ProtectedRoute>
               }
             />
 
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/board" replace />} />
           </Routes>
         </div>
       </BrowserRouter>

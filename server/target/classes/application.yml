@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/dev_ops}
+    username: ${DB_USER:devops}
+    password: ${DB_PASSWORD:devops}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:change_this_secret_to_a_long_random_string_32_chars_min}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
