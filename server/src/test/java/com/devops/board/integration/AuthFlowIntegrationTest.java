@@ -31,6 +31,7 @@ class AuthFlowIntegrationTest extends IntegrationTestBase {
 
     @BeforeEach
     void clean() {
+        jdbcTemplate.update("DELETE FROM board_items");
         jdbcTemplate.update("UPDATE board_state SET text = '', author_id = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = 1");
         jdbcTemplate.update("DELETE FROM users");
     }

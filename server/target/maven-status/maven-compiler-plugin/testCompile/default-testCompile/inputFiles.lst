@@ -1,5 +1,7 @@
 C:\Users\timur\IdeaProjects\dev_ops\server\src\test\java\com\devops\board\integration\AuthFlowIntegrationTest.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\test\java\com\devops\board\integration\BoardFlowIntegrationTest.java
+C:\Users\timur\IdeaProjects\dev_ops\server\src\test\java\com\devops\board\integration\BoardItemsCrudIntegrationTest.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\test\java\com\devops\board\integration\IntegrationTestBase.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\test\java\com\devops\board\service\AuthServiceTest.java
+C:\Users\timur\IdeaProjects\dev_ops\server\src\test\java\com\devops\board\service\BoardItemServiceTest.java
 C:\Users\timur\IdeaProjects\dev_ops\server\src\test\java\com\devops\board\service\BoardServiceTest.java
