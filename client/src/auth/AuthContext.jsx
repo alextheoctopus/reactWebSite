@@ -1,11 +1,14 @@
 import * as AuthAPI from "../api/auth";
+import { getToken } from "../api/client";
 import {
   createContext,
   useContext,
   useMemo,
   useState,
-  useCallback
+  useCallback,
+  useEffect,
 } from "react";
+
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -20,53 +23,99 @@ export function AuthProvider({ children }) {
     return me;
   }, []);
 
-  const login = useCallback(async ({ login, password }) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await AuthAPI.login({ login, password });
-      await refresh();
-    } catch (e) {
-      setError(e);
-      throw e;
-    } finally {
-      setLoading(false);
-    }
-  }, [refresh]);
+  useEffect(() => {
+    let cancelled = false;
 
-  const register = useCallback(async ({ name, login, password }) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await AuthAPI.register({ name, login, password });
-      await refresh();
-    } catch (e) {
-      setError(e);
-      throw e;
-    } finally {
-      setLoading(false);
+    async function bootstrap() {
+      const token = getToken();
+      if (!token) {
+        if (!cancelled) {
+          setUser(null);
+          setLoading(false);
+        }
+        return;
+      }
+
+      try {
+        const me = await AuthAPI.me();
+        if (!cancelled) {
+          setUser(me);
+          localStorage.setItem("user", JSON.stringify(me));
+        }
+      } catch {
+        if (!cancelled) {
+          AuthAPI.logout();
+          localStorage.removeItem("user");
+          setUser(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
     }
-  }, [refresh]);
+
+    bootstrap();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const login = useCallback(
+    async ({ login, password }) => {
+      setLoading(true);
+      setError(null);
+      try {
+        await AuthAPI.login({ login, password });
+        await refresh();
+      } catch (e) {
+        setError(e);
+        throw e;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [refresh]
+  );
+
+  const register = useCallback(
+    async ({ name, login, password }) => {
+      setLoading(true);
+      setError(null);
+      try {
+        await AuthAPI.register({ name, login, password });
+        await refresh();
+      } catch (e) {
+        setError(e);
+        throw e;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [refresh]
+  );
 
   const logout = useCallback(() => {
     AuthAPI.logout();
     localStorage.removeItem("user");
     setUser(null);
+    setLoading(false);
   }, []);
 
   const value = useMemo(
-  () => ({
-    user,
-    isAuth: Boolean(user),
-    loading,
-    error,
-    login,
-    register,
-    logout,
-    refresh,
-  }),
-  [user, loading, error, login, register, logout, refresh]
-);
+    () => ({
+      user,
+      isAuth: Boolean(user),
+      loading,
+      error,
+      login,
+      register,
+      logout,
+      refresh,
+    }),
+    [user, loading, error, login, register, logout, refresh]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

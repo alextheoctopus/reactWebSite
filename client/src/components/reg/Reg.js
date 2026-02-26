@@ -4,49 +4,52 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 
 export default function Reg() {
-    const inputLogin = useRef(null);
-    const inputPassword = useRef(null);
-    const inputName = useRef(null);
-    const { register } = useAuth();
-    const nav = useNavigate();
+  const inputLogin = useRef(null);
+  const inputPassword = useRef(null);
+  const inputName = useRef(null);
+  const { register } = useAuth();
+  const nav = useNavigate();
 
-    const [err, setErr] = useState("");
-    const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
 
-    const registrationClickHandler = async () => {
-        setErr("");
-        setBusy(true);
-        try {
-            await register({
-                name: inputName.current.value.trim(),
-                login: inputLogin.current.value.trim(),
-                password: inputPassword.current.value,
-            });
-            nav("/notes");
-        } catch (e) {
-            setErr(e?.message || "Ошибка регистрации");
-        } finally {
-            setBusy(false);
-        }
-    };
+  const registrationClickHandler = async () => {
+    setErr("");
+    setBusy(true);
+    try {
+      await register({
+        name: inputName.current.value.trim(),
+        login: inputLogin.current.value.trim(),
+        password: inputPassword.current.value,
+      });
+      nav("/board");
+    } catch (e) {
+      setErr(e?.message || "Registration error");
+    } finally {
+      setBusy(false);
+    }
+  };
 
-    return (
-        <div className="pageCenter">
-            <div className="authCard">
-                <input id="name" ref={inputName} placeholder="Ваше имя" />
-                <input id="login" ref={inputLogin} placeholder="Логин" />
-                <input id="password" ref={inputPassword} placeholder="Пароль" type="password" />
+  return (
+    <div className="pageCenter">
+      <div className="authCard">
+        <input id="name" ref={inputName} placeholder="Your name" />
+        <input id="login" ref={inputLogin} placeholder="Login" />
+        <input id="password" ref={inputPassword} placeholder="Password" type="password" />
 
-                {err ? <div className="authError">{err}</div> : null}
-                <button id="regSbmBtn" onClick={registrationClickHandler} disabled={busy}>
-                    Зарегистрироваться
-                </button>
+        {err ? <div className="authError">{err}</div> : null}
 
-                <div className="authTop">
-                    Уже есть аккаунт?
-                    <Link to="/login" className="authLink">Войти</Link>
-                </div>
-            </div>
+        <button id="regSbmBtn" onClick={registrationClickHandler} disabled={busy}>
+          Register
+        </button>
+
+        <div className="authTop">
+          Already have account?
+          <Link to="/login" className="authLink">
+            Sign in
+          </Link>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
