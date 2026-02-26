@@ -49,6 +49,7 @@ class BoardItemsCrudIntegrationTest extends IntegrationTestBase {
             .andExpect(jsonPath("$.id").isNumber())
             .andExpect(jsonPath("$.text").value("First note"))
             .andExpect(jsonPath("$.authorName").value("Timur"))
+            .andExpect(jsonPath("$.lastEditorName").value("Timur"))
             .andReturn();
 
         Long itemId = objectMapper.readTree(createResult.getResponse().getContentAsString()).get("id").asLong();
@@ -92,7 +93,7 @@ class BoardItemsCrudIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    void updateByAnotherUserReturnsForbidden() throws Exception {
+    void updateByAnotherUserUpdatesLastEditor() throws Exception {
         String ownerToken = registerAndGetToken("timur");
         String secondToken = registerAndGetToken("alex");
 
@@ -109,7 +110,10 @@ class BoardItemsCrudIntegrationTest extends IntegrationTestBase {
                 .header("Authorization", "Bearer " + secondToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"text\":\"Hack\"}"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.authorName").value("Timur"))
+            .andExpect(jsonPath("$.lastEditorName").value("Alex"))
+            .andExpect(jsonPath("$.text").value("Hack"));
     }
 
     private String registerAndGetToken(String login) throws Exception {

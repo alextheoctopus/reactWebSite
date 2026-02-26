@@ -33,6 +33,7 @@ public class BoardItemService {
         BoardItem item = new BoardItem();
         item.setText(trimmed);
         item.setAuthor(author);
+        item.setLastEditor(author);
 
         BoardItem saved = boardItemRepository.save(item);
         return toResponse(saved);
@@ -56,11 +57,13 @@ public class BoardItemService {
     @Transactional
     public BoardItemResponse update(Long id, String text, AuthenticatedUser principal) {
         String trimmed = normalizeText(text);
+        User editor = getCurrentUser(principal);
+
         BoardItem item = boardItemRepository.findById(id)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Board item not found"));
 
-        assertAuthor(item, principal);
         item.setText(trimmed);
+        item.setLastEditor(editor);
 
         BoardItem saved = boardItemRepository.save(item);
         return toResponse(saved);
@@ -97,11 +100,14 @@ public class BoardItemService {
 
     private BoardItemResponse toResponse(BoardItem item) {
         User author = item.getAuthor();
+        User lastEditor = item.getLastEditor();
         return new BoardItemResponse(
             item.getId(),
             item.getText(),
             author != null ? author.getId() : null,
             author != null ? author.getName() : null,
+            lastEditor != null ? lastEditor.getId() : null,
+            lastEditor != null ? lastEditor.getName() : null,
             item.getCreatedAt(),
             item.getUpdatedAt()
         );

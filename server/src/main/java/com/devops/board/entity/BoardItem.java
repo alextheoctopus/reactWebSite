@@ -29,6 +29,10 @@ public class BoardItem {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "last_editor_id", nullable = false)
+    private User lastEditor;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -73,6 +77,14 @@ public class BoardItem {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public User getLastEditor() {
+        return lastEditor;
+    }
+
+    public void setLastEditor(User lastEditor) {
+        this.lastEditor = lastEditor;
     }
 
     public LocalDateTime getCreatedAt() {

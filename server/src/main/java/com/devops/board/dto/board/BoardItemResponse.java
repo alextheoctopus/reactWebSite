@@ -8,6 +8,8 @@ public class BoardItemResponse {
     private final String text;
     private final Long authorId;
     private final String authorName;
+    private final Long lastEditorId;
+    private final String lastEditorName;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
@@ -15,12 +17,16 @@ public class BoardItemResponse {
                              String text,
                              Long authorId,
                              String authorName,
+                             Long lastEditorId,
+                             String lastEditorName,
                              LocalDateTime createdAt,
                              LocalDateTime updatedAt) {
         this.id = id;
         this.text = text;
         this.authorId = authorId;
         this.authorName = authorName;
+        this.lastEditorId = lastEditorId;
+        this.lastEditorName = lastEditorName;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -39,6 +45,14 @@ public class BoardItemResponse {
 
     public String getAuthorName() {
         return authorName;
+    }
+
+    public Long getLastEditorId() {
+        return lastEditorId;
+    }
+
+    public String getLastEditorName() {
+        return lastEditorName;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -18,6 +18,7 @@ describe("BoardPage", () => {
         id: 11,
         text: "Initial text",
         authorName: "Timur",
+        lastEditorName: "Timur",
         updatedAt: "2026-02-25T18:00:00",
       },
     ]);
@@ -27,7 +28,8 @@ describe("BoardPage", () => {
     await screen.findByText("Initial text");
 
     expect(screen.getByText(/Author:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Timur/i)).toBeInTheDocument();
+    expect(screen.getByText(/Last editor:/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Timur/i)).toHaveLength(2);
     expect(BoardApi.listBoardItems).toHaveBeenCalledTimes(1);
   });
 
@@ -37,6 +39,7 @@ describe("BoardPage", () => {
       id: 12,
       text: "New text",
       authorName: "Timur",
+      lastEditorName: "Timur",
       updatedAt: "2026-02-25T19:00:00",
     });
 
@@ -60,6 +63,7 @@ describe("BoardPage", () => {
         id: 13,
         text: "Old text",
         authorName: "Timur",
+        lastEditorName: "Timur",
         updatedAt: "2026-02-25T18:00:00",
       },
     ]);
@@ -68,6 +72,7 @@ describe("BoardPage", () => {
       id: 13,
       text: "Changed text",
       authorName: "Timur",
+      lastEditorName: "Alex",
       updatedAt: "2026-02-25T19:00:00",
     });
 
@@ -84,6 +89,7 @@ describe("BoardPage", () => {
     });
 
     expect(await screen.findByText("Changed text")).toBeInTheDocument();
+    expect(await screen.findByText(/Alex/i)).toBeInTheDocument();
   });
 
   test("deletes board item", async () => {
@@ -92,6 +98,7 @@ describe("BoardPage", () => {
         id: 14,
         text: "Delete me",
         authorName: "Timur",
+        lastEditorName: "Timur",
         updatedAt: "2026-02-25T18:00:00",
       },
     ]);

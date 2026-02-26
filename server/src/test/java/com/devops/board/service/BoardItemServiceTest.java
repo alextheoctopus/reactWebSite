@@ -46,6 +46,7 @@ class BoardItemServiceTest {
         saved.setId(10L);
         saved.setText("Hello");
         saved.setAuthor(author);
+        saved.setLastEditor(author);
         saved.setCreatedAt(LocalDateTime.now());
         saved.setUpdatedAt(LocalDateTime.now());
 
@@ -57,6 +58,7 @@ class BoardItemServiceTest {
         assertEquals(10L, response.getId());
         assertEquals("Hello", response.getText());
         assertEquals("Timur", response.getAuthorName());
+        assertEquals("Timur", response.getLastEditorName());
     }
 
     @Test
@@ -69,6 +71,7 @@ class BoardItemServiceTest {
         item.setId(100L);
         item.setText("Text");
         item.setAuthor(author);
+        item.setLastEditor(author);
         item.setCreatedAt(LocalDateTime.now());
         item.setUpdatedAt(LocalDateTime.now());
 
@@ -90,21 +93,31 @@ class BoardItemServiceTest {
     }
 
     @Test
-    void updateRejectsForeignUser() {
+    void updateByAnotherUserChangesLastEditor() {
         User author = new User();
         author.setId(1L);
+        author.setName("Timur");
+
+        User editor = new User();
+        editor.setId(2L);
+        editor.setName("Other");
 
         BoardItem item = new BoardItem();
         item.setId(10L);
         item.setText("Old");
         item.setAuthor(author);
+        item.setLastEditor(author);
+        item.setCreatedAt(LocalDateTime.now());
+        item.setUpdatedAt(LocalDateTime.now());
 
         when(boardItemRepository.findById(10L)).thenReturn(Optional.of(item));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(editor));
+        when(boardItemRepository.save(any(BoardItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ApiException ex = assertThrows(ApiException.class,
-            () -> boardItemService.update(10L, "New", new AuthenticatedUser(2L, "other", "Other")));
+        BoardItemResponse response = boardItemService.update(10L, "New", new AuthenticatedUser(2L, "other", "Other"));
 
-        assertEquals(HttpStatus.FORBIDDEN, ex.getStatus());
+        assertEquals("Timur", response.getAuthorName());
+        assertEquals("Other", response.getLastEditorName());
     }
 
     @Test
@@ -117,10 +130,12 @@ class BoardItemServiceTest {
         item.setId(10L);
         item.setText("Old");
         item.setAuthor(author);
+        item.setLastEditor(author);
         item.setCreatedAt(LocalDateTime.now());
         item.setUpdatedAt(LocalDateTime.now());
 
         when(boardItemRepository.findById(10L)).thenReturn(Optional.of(item));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(author));
         when(boardItemRepository.save(any(BoardItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         BoardItemResponse response = boardItemService.update(10L, "Updated", new AuthenticatedUser(1L, "timur", "Timur"));
@@ -136,11 +151,30 @@ class BoardItemServiceTest {
         BoardItem item = new BoardItem();
         item.setId(10L);
         item.setAuthor(author);
+        item.setLastEditor(author);
 
         when(boardItemRepository.findById(10L)).thenReturn(Optional.of(item));
 
         boardItemService.delete(10L, new AuthenticatedUser(1L, "timur", "Timur"));
 
         verify(boardItemRepository).delete(item);
+    }
+
+    @Test
+    void deleteByAnotherUserIsForbidden() {
+        User author = new User();
+        author.setId(1L);
+
+        BoardItem item = new BoardItem();
+        item.setId(10L);
+        item.setAuthor(author);
+        item.setLastEditor(author);
+
+        when(boardItemRepository.findById(10L)).thenReturn(Optional.of(item));
+
+        ApiException ex = assertThrows(ApiException.class,
+            () -> boardItemService.delete(10L, new AuthenticatedUser(2L, "other", "Other")));
+
+        assertEquals(HttpStatus.FORBIDDEN, ex.getStatus());
     }
 }

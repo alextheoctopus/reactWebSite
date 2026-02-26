@@ -161,6 +161,9 @@ export default function BoardPage() {
               <p style={{ margin: "0 0 6px" }}>
                 <strong>Author:</strong> {item.authorName || "Unknown"}
               </p>
+              <p style={{ margin: "0 0 6px" }}>
+                <strong>Last editor:</strong> {item.lastEditorName || "Unknown"}
+              </p>
               <p style={{ margin: "0 0 10px" }}>
                 <strong>Updated:</strong> {item.updatedAt || "-"}
               </p>
