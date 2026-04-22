@@ -1,39 +1,48 @@
-# This is a basic workflow to help you get started with Actions
+name: Push Docker Images To Yandex Cloud CR
 
-name: Push To Yandex Cloud CR
-
-# Controls when the action will run. 
 on:
   release:
     types: [created]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  build-and-push:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    permissions:
+      contents: read
+    env:
+      CR_REGISTRY: ${{ secrets.YC_CR_REGISTRY_ID }}
+      SERVER_REPOSITORY: server-rep
+      CLIENT_REPOSITORY: client-rep
+      IMAGE_TAG: ${{ github.event.release.tag_name || github.sha }}
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      # Runs a single command using the runners shell
-      - name: Yandex Cloud CR "Login" Action for GitHub Actions
-        uses: yc-actions/yc-cr-login@v0.1-alpha
+      - name: Login to Yandex Cloud Container Registry
+        uses: yc-actions/yc-cr-login@v3
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
 
-
-      - name: Build, tag, and push image to Yandex Cloud Container Registry
-        env:
-          CR_REGISTRY: crp116rj4sbn1tggpifh
-          CR_REPOSITORY: yc-cr-github-action
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Validate registry config
         run: |
-          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
-          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+          for v in CR_REGISTRY SERVER_REPOSITORY CLIENT_REPOSITORY; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Missing required value: $v"
+              exit 1
+            fi
+          done
+
+      - name: Build and push backend image
+        run: |
+          docker build \
+            -t cr.yandex/$CR_REGISTRY/$SERVER_REPOSITORY:$IMAGE_TAG \
+            ./server
+          docker push cr.yandex/$CR_REGISTRY/$SERVER_REPOSITORY:$IMAGE_TAG
+
+      - name: Build and push frontend image
+        run: |
+          docker build \
+            --build-arg REACT_APP_API_URL= \
+            -t cr.yandex/$CR_REGISTRY/$CLIENT_REPOSITORY:$IMAGE_TAG \
+            ./client
+          docker push cr.yandex/$CR_REGISTRY/$CLIENT_REPOSITORY:$IMAGE_TAG
