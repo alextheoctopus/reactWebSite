@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yandex-tank-config
+  namespace: dev-ops
+data:
+  load.yaml: |
+    phantom:
+      address: server.dev-ops.svc.cluster.local:8080
+      ammo_type: uripost
+      ammofile: /var/loadtest/ammo.txt
+      load_profile:
+        load_type: rps
+        schedule: line(5, 60, 4m) const(60, 3m)
+      instances: 200
+      timeout: 10s
+    autostop:
+      autostop:
+        - http(5xx,50%,30s)
+    console:
+      enabled: true
+    telegraf:
+      enabled: false
+  ammo.txt: |
+    [Host: server.dev-ops.svc.cluster.local]
+    [Connection: close]
+    [Content-Type: application/json]
+    48 /api/auth/login
+    {"login":"tank-user","password":"tank-pass-123"}

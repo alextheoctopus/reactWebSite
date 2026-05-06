@@ -1,0 +1,54 @@
+yc iam service-account create --name terrafrom
+
+done (2s)
+id: ajem14ljf9hg0orh0lpm
+folder_id: b1gbcinm5lpgelt9pfrs
+created_at: "2026-04-22T21:08:13Z"
+name: terrafrom
+
+yc resource-manager folder add-access-binding b1gbcinm5lpgelt9pfrs --role admin --subject serviceAccount:ajem14ljf9hg0orh0lpm
+
+done (2s)
+effective_deltas:
+  - action: ADD
+    access_binding:
+      role_id: admin
+      subject:
+        id: ajem14ljf9hg0orh0lpm
+        type: serviceAccount
+
+yc iam key create --service-account-id ajem14ljf9hg0orh0lpm --folder-name default --output key.json
+
+id: ajetqped73mknft2g2n6
+service_account_id: ajem14ljf9hg0orh0lpm
+created_at: "2026-04-22T21:12:11.372589187Z"
+key_algorithm: RSA_2048
+
+$Env:YC_TOKEN=$(yc iam create-token --impersonate-service-account-id ajem14ljf9hg0orh0lpm)
+$Env:YC_CLOUD_ID=$(yc config get cloud-id)
+$Env:YC_FOLDER_ID=$(yc config get folder-id)
+
+zone: ru-central1-b
+
+
+# 1) Запустить нагрузку
+kubectl apply -k infra/k8s/loadtest
+
+# 2) Смотреть pod нагрузчика (создание/статус)
+kubectl -n dev-ops get pods -l app=yandex-tank-load -w
+
+# 3) Смотреть логи нагрузчика
+kubectl -n dev-ops logs -f job/yandex-tank-load
+
+# 4) Смотреть, как реагирует автоскейл backend
+kubectl -n dev-ops get hpa server-hpa -w
+kubectl -n dev-ops get pods -l app=server -w
+
+# 5) Остановить/удалить нагрузку (job)
+kubectl -n dev-ops delete job yandex-tank-load
+
+# 6) Если pod завис и не удалился
+kubectl -n dev-ops delete pod -l app=yandex-tank-load --force --grace-period=0
+
+# 7) Повторный запуск после удаления
+kubectl apply -k infra/k8s/loadtest
