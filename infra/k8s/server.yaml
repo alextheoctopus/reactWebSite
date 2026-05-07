@@ -26,8 +26,8 @@ spec:
             - until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done
       containers:
         - name: server
-          image: cr.yandex/crp116rj4sbn1tggpifh/server-rep:v0.0.1
-          imagePullPolicy: Always
+          image: reactwebsite-server:local
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           env:

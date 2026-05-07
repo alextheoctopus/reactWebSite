@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: client
-          image: cr.yandex/crp116rj4sbn1tggpifh/client-rep:v0.0.1
-          imagePullPolicy: Always
+          image: reactwebsite-client:local
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
           readinessProbe:
