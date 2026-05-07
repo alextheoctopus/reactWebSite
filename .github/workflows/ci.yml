@@ -12,7 +12,7 @@ on:
 
 env:
   REGISTRY: cr.yandex
-  REGISTRY_ID: crp5sudqg64hs0pqfaaf
+  REGISTRY_ID: crpc8d4d2ov5uvmf14qe
   SERVER_IMAGE_NAME: reactwebsite-server
   CLIENT_IMAGE_NAME: reactwebsite-client
 
