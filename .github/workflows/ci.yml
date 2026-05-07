@@ -1,8 +1,20 @@
-name: CI
+name: CI-CD
 
 on:
   push:
+    branches:
+      - main
+      - master
+      - devops-L01
+      - lab-04-local
   pull_request:
+  workflow_dispatch:
+
+env:
+  REGISTRY: cr.yandex
+  REGISTRY_ID: crp5sudqg64hs0pqfaaf
+  SERVER_IMAGE_NAME: reactwebsite-server
+  CLIENT_IMAGE_NAME: reactwebsite-client
 
 jobs:
   backend_build:
@@ -12,7 +24,8 @@ jobs:
       run:
         working-directory: server
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -21,7 +34,7 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Build (skip tests)
+      - name: Build backend
         run: mvn -B -DskipTests package
 
   backend_test:
@@ -32,7 +45,8 @@ jobs:
       run:
         working-directory: server
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -41,8 +55,16 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Run unit tests
-        run: mvn -B test
+      - name: Run backend tests with coverage
+        run: mvn -B clean verify jacoco:report
+
+      - name: Upload backend test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            server/target/site/jacoco
+            server/target/surefire-reports
 
   frontend_build:
     name: Frontend - Build
@@ -51,7 +73,8 @@ jobs:
       run:
         working-directory: client
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -63,7 +86,7 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Build
+      - name: Build frontend
         run: npm run build
 
   frontend_test:
@@ -76,7 +99,8 @@ jobs:
     env:
       CI: true
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -88,6 +112,101 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Run tests
-        run: npm test -- --watchAll=false
+      - name: Run frontend tests with coverage
+        run: npm test -- --watchAll=false --coverage
 
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: client/coverage
+
+  sonarqube:
+    name: SonarQube Analysis
+    runs-on: ubuntu-latest
+    needs:
+      - backend_test
+      - frontend_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Download backend reports
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-test-reports
+          path: server/target
+
+      - name: Download frontend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-coverage
+          path: client/coverage
+
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: SonarQube Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
+        timeout-minutes: 10
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  docker_build_and_push:
+    name: Docker - Build and Push
+    runs-on: ubuntu-latest
+    needs:
+      - sonarqube
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image tags
+        run: |
+          echo "SERVER_IMAGE=${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}/${{ env.SERVER_IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_ENV
+          echo "CLIENT_IMAGE=${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}/${{ env.CLIENT_IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_ENV
+          echo "SERVER_IMAGE_LATEST=${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}/${{ env.SERVER_IMAGE_NAME }}:latest" >> $GITHUB_ENV
+          echo "CLIENT_IMAGE_LATEST=${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}/${{ env.CLIENT_IMAGE_NAME }}:latest" >> $GITHUB_ENV
+
+      - name: Log in to Yandex Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: cr.yandex
+          username: oauth
+          password: ${{ secrets.YC_OAUTH_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          push: true
+          tags: |
+            ${{ env.SERVER_IMAGE }}
+            ${{ env.SERVER_IMAGE_LATEST }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./client
+          push: true
+          tags: |
+            ${{ env.CLIENT_IMAGE }}
+            ${{ env.CLIENT_IMAGE_LATEST }}
