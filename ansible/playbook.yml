@@ -1,0 +1,126 @@
+---
+- name: Install Docker and run reactWebSite on VM
+  hosts: app
+  become: true
+
+  vars:
+    app_dir: /opt/reactwebsite
+    repo_url: "https://github.com/alextheoctopus/reactWebSite.git"
+    repo_version: "lab-04-local"
+    app_env:
+      POSTGRES_DB: dev_ops
+      POSTGRES_USER: devops
+      POSTGRES_PASSWORD: devops
+      JWT_SECRET: change_this_secret_to_a_long_random_string_32_chars_min
+      JWT_EXPIRATION_MS: "86400000"
+      SERVER_PORT: "8080"
+      SERVER_PUBLISHED_PORT: "8080"
+      CLIENT_PUBLISHED_PORT: "3000"
+      REACT_APP_API_URL: ""
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - git
+          - python3-pip
+        state: present
+
+    - name: Create keyrings directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Add Docker GPG key
+      ansible.builtin.shell: |
+          set -euo pipefail
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      args:
+          creates: /etc/apt/keyrings/docker.gpg
+          executable: /bin/bash
+
+    - name: Add Docker apt repository
+      ansible.builtin.shell: |
+          set -euo pipefail
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo $VERSION_CODENAME) stable" > /etc/apt/sources.list.d/docker.list
+      args:
+          creates: /etc/apt/sources.list.d/docker.list
+          executable: /bin/bash
+
+    - name: Install Docker Engine and compose plugin
+      ansible.builtin.apt:
+        update_cache: true
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: Ensure docker service is enabled and started
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Add login user to docker group
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Clone application repository
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: "{{ repo_version }}"
+        force: true
+
+    - name: Create .env for docker compose
+      ansible.builtin.copy:
+        dest: "{{ app_dir }}/.env"
+        mode: "0600"
+        content: |
+          POSTGRES_DB={{ app_env.POSTGRES_DB }}
+          POSTGRES_USER={{ app_env.POSTGRES_USER }}
+          POSTGRES_PASSWORD={{ app_env.POSTGRES_PASSWORD }}
+          JWT_SECRET={{ app_env.JWT_SECRET }}
+          JWT_EXPIRATION_MS={{ app_env.JWT_EXPIRATION_MS }}
+          SERVER_PORT={{ app_env.SERVER_PORT }}
+          SERVER_PUBLISHED_PORT={{ app_env.SERVER_PUBLISHED_PORT }}
+          CLIENT_PUBLISHED_PORT={{ app_env.CLIENT_PUBLISHED_PORT }}
+          REACT_APP_API_URL={{ app_env.REACT_APP_API_URL }}
+
+    - name: Build and start application
+      ansible.builtin.command: docker compose up --build -d
+      args:
+        chdir: "{{ app_dir }}"
+
+    - name: Show running containers
+      ansible.builtin.command: docker compose ps
+      args:
+        chdir: "{{ app_dir }}"
+      register: compose_ps
+      changed_when: false
+
+    - name: Print docker compose status
+      ansible.builtin.debug:
+        var: compose_ps.stdout_lines
