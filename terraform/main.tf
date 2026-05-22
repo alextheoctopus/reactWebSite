@@ -63,6 +63,13 @@ resource "yandex_vpc_security_group" "lab_sg" {
     v4_cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    protocol       = "TCP"
+    description    = "SonarQube"
+    port           = 9000
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     protocol       = "ANY"
     description    = "Allow all outbound"
@@ -72,7 +79,7 @@ resource "yandex_vpc_security_group" "lab_sg" {
   }
 }
 
-resource "yandex_compute_instance" "vm" {
+resource "yandex_compute_instance" "app_vm" {
   name        = var.vm_name
   hostname    = var.vm_name
   platform_id = var.platform_id
@@ -100,4 +107,42 @@ resource "yandex_compute_instance" "vm" {
   metadata = {
     ssh-keys = "${var.ssh_username}:${file(var.ssh_public_key_path)}"
   }
+}
+
+resource "yandex_compute_instance" "sonar_vm" {
+  name        = "${var.project_name}-sonar-vm"
+  hostname    = "${var.project_name}-sonar-vm"
+  platform_id = var.platform_id
+
+  resources {
+    cores         = 2
+    memory        = 4
+    core_fraction = 100
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id = data.yandex_compute_image.ubuntu.id
+      size     = 30
+      type     = var.disk_type
+    }
+  }
+
+  network_interface {
+    subnet_id          = yandex_vpc_subnet.lab_subnet.id
+    nat                = true
+    security_group_ids = [yandex_vpc_security_group.lab_sg.id]
+  }
+
+  metadata = {
+    ssh-keys = "${var.ssh_username}:${file(var.ssh_public_key_path)}"
+  }
+}
+
+output "app_vm_external_ip" {
+  value = yandex_compute_instance.app_vm.network_interface[0].nat_ip_address
+}
+
+output "sonar_vm_external_ip" {
+  value = yandex_compute_instance.sonar_vm.network_interface[0].nat_ip_address
 }
