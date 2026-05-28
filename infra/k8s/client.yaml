@@ -13,6 +13,8 @@ spec:
       labels:
         app: client
     spec:
+      imagePullSecrets:
+        - name: yc-registry-secret
       containers:
         - name: client
           image: cr.yandex/crpc8d4d2ov5uvmf14qe/reactwebsite-client:b5fcb6a4a3879545fea048eadd64d3935d983848
